@@ -10,7 +10,7 @@
 namespace PhysPeach{
     //cellsTest
     void createCellsTest();
-    //void increaseNcTest();
+    void increaseNcTest();
     //void updateCellsTest();
 
     //listsTest

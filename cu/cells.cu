@@ -19,5 +19,13 @@ namespace PhysPeach{
         cudaFree(cells->cell_dev);
         return;
     }
+
+    void increaseNc(Cells *cells){
+        cells->Nc = (int)(1.4 * cells->Nc);
+        int NoC = powInt(cells->numOfCellsPerSide, D)*cells->Nc;
+        cudaFree(cells->cell_dev);
+        cudaMalloc((void**)&cells->cell_dev, NoC * sizeof(int));
+        return;
+    }
     //lists
 }

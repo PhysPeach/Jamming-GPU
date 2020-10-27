@@ -17,5 +17,17 @@ namespace PhysPeach{
 
         return;
     }
+
+    void increaseNcTest(){
+        Cells cells;
+        createCells(&cells, 40.);
+
+        assert(cells.Nc == (int)(3. * (double)Np/ (double)powInt(12, D)));
+        increaseNc(&cells);
+        assert(cells.Nc == (int)(1.4 * (int)(3. * (double)Np/ (double)powInt(12, D))));
+        deleteCells(&cells);
+
+        return;
+    }
     //listsTest
 }

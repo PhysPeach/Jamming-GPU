@@ -41,7 +41,7 @@ int main(){
     //cells_test
     PhysPeach::createCellsTest();
     PhysPeach::increaseNcTest();
-    //PhysPeach::updateCellsTest(); //memory warning: do it in small Np
+    //PhysPeach::updateCellsTest();
 
     //lists_test
     //PhysPeach::createListsTest();
