@@ -9,14 +9,14 @@
 
 namespace PhysPeach{
     //cellsTest
-    void createCellsTest();
-    void increaseNcTest();
-    void updateCellsTest();
+    //void createCellsTest();
+    //void increaseNcTest();
+    //void updateCellsTest();
 
     //listsTest
-    void createListsTest();
-    void increaseNlTest();
-    void updateListsTest();
+    //void createListsTest();
+    //void increaseNlTest();
+    //void updateListsTest();
 
 }
 #endif

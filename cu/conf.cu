@@ -27,4 +27,31 @@ namespace PhysPeach{
     }
     template void setZero<int>(int*, int);
     template void setZero<double>(double*, int);
+
+    //device
+    __global__ void addReduction(double *out, double *in, int len){
+        int i_block = blockIdx.x;
+        int i_local = threadIdx.x;
+        int i_global = i_block * blockDim.x + i_local;
+    
+        __shared__ double f[NT];
+    
+        if(i_global < len){
+            f[i_local] = in[i_global];
+        }
+        __syncthreads();
+
+        int remain, reduce;
+        for(int j = NT; j > 1; j = remain){
+            reduce = j >> 1;
+            remain = j - reduce;
+            if((i_local < reduce) && (i_global + remain < len)){
+                f[i_local] += f[i_local+remain];
+            }
+            __syncthreads();
+        }
+        if(i_local == 0){
+            out[i_block] = f[0];
+        }
+    }
 }

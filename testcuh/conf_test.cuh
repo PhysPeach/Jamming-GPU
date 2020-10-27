@@ -9,5 +9,6 @@
 namespace PhysPeach{
     void powIntTest();
     void setZeroTest();
+    void addReductionTest();
 }
 #endif

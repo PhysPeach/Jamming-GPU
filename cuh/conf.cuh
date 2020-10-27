@@ -3,6 +3,9 @@
 
 #include <math.h>
 
+//gpu
+const int NT = 1024;
+
 const double pi = 3.141592653589793;
 
 const int D = 2;
@@ -25,5 +28,8 @@ namespace PhysPeach{
 
     template<typename T>
     void setZero(T*, int);
+
+    //global
+    __global__ void addReduction(double*, double*, int);
 }
 #endif

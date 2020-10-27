@@ -1,6 +1,8 @@
 #ifndef PARTICLES_CUH
 #define PARTICLES_CUH
 
+#include <cuda.h>
+#include <curand_kernel.h>
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
@@ -14,12 +16,19 @@
 
 namespace PhysPeach{
     struct Particles{
+        //host
         double *diam;
         double packing;
         double *x;
-        double *mem;
         double *v;
-        double *f;
+
+        //device
+        double *diam_dev;
+        double *x_dev;
+        double *mem_dev;
+        double *v_dev;
+        double *f_dev;
+        curandState *rnd_dev;
     };
     double K(Particles*);
     double U(Particles*, double, Lists*);

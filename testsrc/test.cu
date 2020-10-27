@@ -23,31 +23,32 @@ int main(){
     //conf_test
     PhysPeach::powIntTest();
     PhysPeach::setZeroTest();
+    PhysPeach::addReductionTest();
 
     //particles_test
     PhysPeach::createParticlesTest();
-    PhysPeach::squeezePositionsTest();
-    PhysPeach::powerParticlesTest();
-    PhysPeach::convergedFireTest();
-    PhysPeach::updateMemTest();
-    PhysPeach::modifyVelocitiesTest();
-    PhysPeach::UandPTest();
-    PhysPeach::updateForcesTest();
-    PhysPeach::updateParticlesTest();
+    //PhysPeach::squeezePositionsTest();
+    //PhysPeach::powerParticlesTest();
+    //PhysPeach::convergedFireTest();
+    //PhysPeach::updateMemTest();
+    //PhysPeach::modifyVelocitiesTest();
+    //PhysPeach::UandPTest();
+    //PhysPeach::updateForcesTest();
+    //PhysPeach::updateParticlesTest();
 
     //cells_test
-    PhysPeach::createCellsTest();
-    PhysPeach::increaseNcTest();
-    PhysPeach::updateCellsTest(); //memory warning: do it in small Np
+    //PhysPeach::createCellsTest();
+    //PhysPeach::increaseNcTest();
+    //PhysPeach::updateCellsTest(); //memory warning: do it in small Np
 
     //lists_test
-    PhysPeach::createListsTest();
-    PhysPeach::increaseNlTest();
-    PhysPeach::updateListsTest(); //memory warning: do it in small Np
+    //PhysPeach::createListsTest();
+    //PhysPeach::increaseNlTest();
+    //PhysPeach::updateListsTest(); //memory warning: do it in small Np
 
     //jamming_test
-    PhysPeach::createJammingTest();
-    PhysPeach::fireJammingTest();
+    //PhysPeach::createJammingTest();
+    //PhysPeach::fireJammingTest();
     //PhysPeach::addDphiTest();
 
     std::cout << "---finished---" << std::endl;
