@@ -39,4 +39,39 @@ namespace PhysPeach{
         deleteParticles(&p);
         return;
     }
+
+    void powerParticlesTest(){
+        Particles p;
+        double power;
+
+        createParticles(&p);
+
+        for(int par1 = 0; par1 < D*Np; par1++){
+            p.v[par1] = 3.;
+        }
+        cudaMemcpy(p.v_dev, p.v, D * Np * sizeof(double), cudaMemcpyHostToDevice);
+        for(int par1 = 0; par1 < D*Np; par1++){
+            p.v[par1] = 2.;
+        }
+        cudaMemcpy(p.f_dev, p.v, D * Np * sizeof(double), cudaMemcpyHostToDevice);
+
+        power = powerParticles(&p);
+        assert(5.99 * D*Np < power && power < 6.01 * D*Np);
+
+        for(int par1 = 0; par1 < D*Np; par1++){
+            p.v[par1] = 1.;
+        }
+        cudaMemcpy(p.v_dev, p.v, D * Np * sizeof(double), cudaMemcpyHostToDevice);
+        for(int par1 = 0; par1 < D*Np; par1++){
+            p.v[par1] = (double)par1;
+        }
+        cudaMemcpy(p.f_dev, p.v, D * Np * sizeof(double), cudaMemcpyHostToDevice);
+
+        power = powerParticles(&p);
+        assert((double)(D*Np * (D*Np - 1)/2) - 0.1 < power && power < (double)(D*Np * (D*Np - 1)/2) + 0.1);
+
+        deleteParticles(&p);
+        
+        return;
+    }
 }

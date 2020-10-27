@@ -90,4 +90,34 @@ namespace PhysPeach{
 
         return;
     }
+
+    void glo_innerProductTest(){
+        double *arr, *arr_dev[3];
+        arr = (double*)malloc(100000 * sizeof(double));
+        cudaMalloc((void**)&arr_dev[0], 100000 * sizeof(double));
+        cudaMalloc((void**)&arr_dev[1], 100000 * sizeof(double));
+        cudaMalloc((void**)&arr_dev[2], 100000 * sizeof(double));
+
+        for(int i = 0; i < 100000; i++){
+            arr[i] = (double)(2*i);
+        }
+        cudaMemcpy(arr_dev[1], arr, 100000 * sizeof(double), cudaMemcpyHostToDevice);
+        for(int i = 0; i < 100000; i++){
+            arr[i] = (double)i;
+        }
+        cudaMemcpy(arr_dev[2], arr, 100000 * sizeof(double), cudaMemcpyHostToDevice);
+
+        int NB = (100000 + NT - 1)/NT;
+        glo_innerProduct<<<NB, NT>>>(arr_dev[0], arr_dev[1], arr_dev[2], 100000);
+        cudaMemcpy(arr, arr_dev[0], 100000 * sizeof(double), cudaMemcpyDeviceToHost);
+
+        for(int i = 0; i < 100000; i++){
+            assert((double)(2. * i) * (double)i - 0.1 < arr[i] && arr[i] < (double)(2. * i) * (double)i + 0.1);
+        }
+
+        cudaFree(arr_dev[0]);
+        cudaFree(arr_dev[1]);
+        cudaFree(arr_dev[2]);
+        free(arr);
+    }
 }

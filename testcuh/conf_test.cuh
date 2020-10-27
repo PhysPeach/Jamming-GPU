@@ -11,5 +11,6 @@ namespace PhysPeach{
     void setZeroTest();
     void addReductionTest();
     void multipliedTest();
+    void glo_innerProductTest();
 }
 #endif

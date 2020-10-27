@@ -1,6 +1,20 @@
 #include "../cuh/particles.cuh"
 
 namespace PhysPeach{
+    double powerParticles(Particles* p){
+        int flip = 0;
+        glo_innerProduct<<<(D * Np + NT - 1)/NT, NT>>>(p->power_dev[flip], p->v_dev, p->f_dev, D * Np);
+        int remain;
+        for(int len = D * Np; len > 1; len = remain){
+            remain = (len+NT-1)/NT;
+            flip = !flip;
+            addReduction<<<remain,NT>>>(p->power_dev[flip], p->power_dev[!flip], len);
+        }
+        double power;
+        cudaMemcpy(&power, p->power_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
+        return power;
+    }
+
     __global__ void init_genrand_kernel(unsigned long long s, curandState* state){
         int i_global = blockIdx.x * blockDim.x + threadIdx.x;
         curand_init(s, i_global,0,&state[i_global]);
@@ -51,6 +65,9 @@ namespace PhysPeach{
         cudaMalloc((void**)&p->f_dev, D * Np * sizeof(double));
         cudaMalloc((void**)&p->rnd_dev, D * Np * sizeof(curandState));
 
+        cudaMalloc((void**)&p->power_dev[0], D * Np * sizeof(double));
+        cudaMalloc((void**)&p->power_dev[1], D * Np * sizeof(double));
+
         NB = (D * Np+NT-1)/NT;
         init_genrand_kernel<<<NB,NT>>>((unsigned long long)genrand_int32(), p->rnd_dev);
 
@@ -97,6 +114,9 @@ namespace PhysPeach{
         cudaMalloc((void**)&p->f_dev, D * Np * sizeof(double));
         cudaMalloc((void**)&p->rnd_dev, D * Np * sizeof(curandState));
 
+        cudaMalloc((void**)&p->power_dev[0], D * Np * sizeof(double));
+        cudaMalloc((void**)&p->power_dev[1], D * Np * sizeof(double));
+
         NB = (Np+NT-1)/NT;
         init_genrand_kernel<<<NB,NT>>>((unsigned long long)genrand_int32(), p->rnd_dev);
 
@@ -124,6 +144,9 @@ namespace PhysPeach{
         cudaFree(p->v_dev);
         cudaFree(p->f_dev);
         cudaFree(p->rnd_dev);
+
+        cudaFree(p->power_dev[0]);
+        cudaFree(p->power_dev[1]);
         return;
     }
 }

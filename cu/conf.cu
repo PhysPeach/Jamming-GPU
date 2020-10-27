@@ -61,4 +61,11 @@ namespace PhysPeach{
             arr_dev[i_global] *= a;
         }
     }
+
+    __global__ void glo_innerProduct(double* out_dev, double* in1_dev, double* in2_dev, int len){
+        int i_global = blockIdx.x * blockDim.x + threadIdx.x;
+        if(i_global < len){
+            out_dev[i_global] = in1_dev[i_global] * in2_dev[i_global];
+        }
+    }
 }
