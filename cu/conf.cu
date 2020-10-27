@@ -54,4 +54,11 @@ namespace PhysPeach{
             out[i_block] = f[0];
         }
     }
+
+    __global__ void multiplied(double *arr_dev, double a, int len){
+        int i_global = blockIdx.x * blockDim.x + threadIdx.x;
+        if(i_global < len){
+            arr_dev[i_global] *= a;
+        }
+    }
 }

@@ -31,5 +31,6 @@ namespace PhysPeach{
 
     //global
     __global__ void addReduction(double*, double*, int);
+    __global__ void multiplied(double*, double , int);
 }
 #endif

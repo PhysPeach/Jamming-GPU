@@ -11,7 +11,6 @@
 
 namespace PhysPeach{
     void createParticlesTest();
-    //void squeezePositionsTest();
     //void powerParticlesTest();
     //void convergedFireTest();
     //void updateMemTest();

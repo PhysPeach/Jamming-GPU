@@ -65,4 +65,29 @@ namespace PhysPeach{
 
         return;
     }
+
+    void multipliedTest(){
+
+        int NB;
+
+        double *arr, *arr_dev;
+        arr = (double*)malloc(100000 * sizeof(double));
+        cudaMalloc((void**)&arr_dev, 100000 * sizeof(double));
+        for(int i = 0; i < 100000; i++){
+            arr[i] = 1.;
+        }
+        cudaMemcpy(arr_dev, arr, 100000 * sizeof(double), cudaMemcpyHostToDevice);
+
+        NB = (100000 + NT - 1)/NT;
+        multiplied<<<NB, NT>>>(arr_dev, 0.99, 100000);
+        cudaMemcpy(arr, arr_dev, 100000 * sizeof(double), cudaMemcpyDeviceToHost);
+        for(int i = 0; i < 100000; i++){
+            assert(0.989 < arr[i] && arr[i] < 0.991);
+        }
+
+        cudaFree(arr_dev);
+        free(arr);
+
+        return;
+    }
 }

@@ -41,16 +41,17 @@ namespace PhysPeach{
         p->packing = 0;
 
         p->diam = (double*)malloc(Np * sizeof(double));
-        p->x = (double*)malloc(D*Np * sizeof(double));
+        p->x = (double*)malloc(D * Np * sizeof(double));
         p->v = (double*)malloc(D * Np * sizeof(double));
 
         cudaMalloc((void**)&p->diam_dev, Np * sizeof(double));
         cudaMalloc((void**)&p->x_dev, D * Np * sizeof(double));
+        cudaMalloc((void**)&p->mem_dev, D * Np * sizeof(double));
         cudaMalloc((void**)&p->v_dev, D * Np * sizeof(double));
         cudaMalloc((void**)&p->f_dev, D * Np * sizeof(double));
         cudaMalloc((void**)&p->rnd_dev, D * Np * sizeof(curandState));
 
-        NB = (Np+NT-1)/NT;
+        NB = (D * Np+NT-1)/NT;
         init_genrand_kernel<<<NB,NT>>>((unsigned long long)genrand_int32(), p->rnd_dev);
 
         createDiam<<<NB, NT>>>(p->diam_dev, p->rnd_dev, Np);
@@ -77,6 +78,7 @@ namespace PhysPeach{
         int uniformity = (int)(pow(Np, 1./(double)D));
         createPosition<<<NB, NT>>>(p->x_dev, p->rnd_dev, uniformity, L, Np);
         cudaMemcpy(p->mem_dev, p->x_dev, D * Np * sizeof(double), cudaMemcpyDeviceToDevice);
+
         return;
     }
 
@@ -90,6 +92,7 @@ namespace PhysPeach{
 
         cudaMalloc((void**)&p->diam_dev, Np * sizeof(double));
         cudaMalloc((void**)&p->x_dev, D * Np * sizeof(double));
+        cudaMalloc((void**)&p->mem_dev, D * Np * sizeof(double));
         cudaMalloc((void**)&p->v_dev, D * Np * sizeof(double));
         cudaMalloc((void**)&p->f_dev, D * Np * sizeof(double));
         cudaMalloc((void**)&p->rnd_dev, D * Np * sizeof(curandState));
@@ -117,6 +120,7 @@ namespace PhysPeach{
         free(p->v);
         cudaFree(p->diam_dev);
         cudaFree(p->x_dev);
+        cudaFree(p->mem_dev);
         cudaFree(p->v_dev);
         cudaFree(p->f_dev);
         cudaFree(p->rnd_dev);

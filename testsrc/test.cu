@@ -24,10 +24,10 @@ int main(){
     PhysPeach::powIntTest();
     PhysPeach::setZeroTest();
     PhysPeach::addReductionTest();
+    PhysPeach::multipliedTest();
 
     //particles_test
     PhysPeach::createParticlesTest();
-    //PhysPeach::squeezePositionsTest();
     //PhysPeach::powerParticlesTest();
     //PhysPeach::convergedFireTest();
     //PhysPeach::updateMemTest();

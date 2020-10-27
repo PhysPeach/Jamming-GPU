@@ -6,6 +6,7 @@ namespace PhysPeach{
 
         Particles p;
         createParticles(&p);
+        cudaMemcpy(p.x, p.x_dev, D * Np * sizeof(double), cudaMemcpyDeviceToHost);
 
         double diamav = 0.;
         double xav[D];
