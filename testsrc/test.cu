@@ -39,8 +39,8 @@ int main(){
     //PhysPeach::updateParticlesTest();
 
     //cells_test
-    //PhysPeach::createCellsTest();
-    //PhysPeach::increaseNcTest();
+    PhysPeach::createCellsTest();
+    PhysPeach::increaseNcTest();
     //PhysPeach::updateCellsTest(); //memory warning: do it in small Np
 
     //lists_test

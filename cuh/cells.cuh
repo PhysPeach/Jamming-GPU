@@ -7,9 +7,10 @@
 
 namespace PhysPeach{
     struct Cells{
-        int *cell;
         int numOfCellsPerSide;
         int Nc;
+
+        int *cell_dev;
     };
     void createCells(Cells*, double);
     void deleteCells(Cells*);
