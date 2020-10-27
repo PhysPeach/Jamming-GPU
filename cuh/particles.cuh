@@ -43,7 +43,7 @@ namespace PhysPeach{
     void deleteParticles(Particles*);
     bool updateParticles(Particles*, double, double, Lists*);
     bool updateMem(Particles*, double);
-    void modifyVelocities(Particles*, double);
+    __global__ void modifyVelocities(double*, double*, double , int);
     bool convergedFire(Particles*);
 }
 

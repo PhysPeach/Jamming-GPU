@@ -105,4 +105,29 @@ namespace PhysPeach{
 
         return;
     }
+
+    void modifyVelocitiesTest(){
+        int NB = (Np + NT - 1)/NT;
+        Particles p;
+
+        createParticles(&p);
+
+        double s = 1.;
+        cudaMemcpy(&p.v_dev[0], &s, sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(&p.f_dev[Np], &s, sizeof(double), cudaMemcpyHostToDevice);
+        modifyVelocities<<<NB, NT>>>(p.v_dev, p.f_dev, 0.2, Np);
+        cudaMemcpy(&s, &p.v_dev[0], sizeof(double), cudaMemcpyDeviceToHost);
+        assert(0.79 < s && s < 0.81);
+        cudaMemcpy(&s, &p.v_dev[Np], sizeof(double), cudaMemcpyDeviceToHost);
+        assert(0.19 < s && s < 0.21);
+
+        modifyVelocities<<<NB, NT>>>(p.v_dev, p.f_dev, 0.3, Np);
+        cudaMemcpy(&s, &p.v_dev[0], sizeof(double), cudaMemcpyDeviceToHost);
+        assert(0.55 < s && s < 0.57);
+        cudaMemcpy(&s, &p.v_dev[Np], sizeof(double), cudaMemcpyDeviceToHost);
+        assert(0.37 < s && s < 0.39);
+
+        deleteParticles(&p);
+        return;
+    }
 }

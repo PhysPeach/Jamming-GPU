@@ -13,8 +13,8 @@ namespace PhysPeach{
     void createParticlesTest();
     void powerParticlesTest();
     void convergedFireTest();
+    void modifyVelocitiesTest();
     //void updateMemTest();
-    //void modifyVelocitiesTest();
     //void UandPTest();
     //void updateForcesTest();
     //void updateParticlesTest();

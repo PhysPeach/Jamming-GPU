@@ -157,6 +157,31 @@ namespace PhysPeach{
         return;
     }
 
+    __global__ void modifyVelocities(double *v_dev, double *f_dev, double a, int np){
+        int i_global = blockIdx.x * blockDim.x + threadIdx.x;
+        double v, f;
+        if(i_global < np){
+            v = 0.;
+            f = 0.;
+            for(int d = 0; d < D; d++){
+                v += v_dev[d*np + i_global] * v_dev[d*np + i_global];
+                f += f_dev[d*np + i_global] * f_dev[d*np + i_global];
+            }
+            if(f > 0.){
+                v = sqrt(v);
+                f = sqrt(f);
+                for(int d = 0; d < D; d++){
+                    v_dev[d*np + i_global] = (1-a) * v_dev[d*np + i_global] + a * v * f_dev[d*np + i_global] / f;
+                }
+            }else{
+                v = sqrt(v);
+                for(int d = 0; d < D; d++){
+                    v_dev[d*np + i_global] = (1-a) * v_dev[d*np + i_global];
+                }
+            }
+        }
+    }
+
     bool convergedFire(Particles *p){
         double fmax = 3.0e-12;
         int flip = 0;

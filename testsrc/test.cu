@@ -32,8 +32,8 @@ int main(){
     PhysPeach::createParticlesTest();
     PhysPeach::powerParticlesTest();
     PhysPeach::convergedFireTest();
+    PhysPeach::modifyVelocitiesTest();
     //PhysPeach::updateMemTest();
-    //PhysPeach::modifyVelocitiesTest();
     //PhysPeach::UandPTest();
     //PhysPeach::updateForcesTest();
     //PhysPeach::updateParticlesTest();
