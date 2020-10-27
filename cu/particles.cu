@@ -1,4 +1,4 @@
-#include "../hpp/particles.hpp"
+#include "../cuh/particles.cuh"
 
 namespace PhysPeach{
     double K(Particles *p){

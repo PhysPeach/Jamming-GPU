@@ -1,4 +1,4 @@
-#include "../hpp/conf.hpp"
+#include "../cuh/conf.cuh"
 
 namespace PhysPeach{
     template<typename T>

@@ -1,9 +1,9 @@
-#ifndef CELLS_HPP
-#define CELLS_HPP
+#ifndef CELLS_CUH
+#define CELLS_CUH
 
 #include <iostream>
 #include <stdlib.h>
-#include "../hpp/conf.hpp"
+#include "../cuh/conf.cuh"
 
 namespace PhysPeach{
     struct Cells{

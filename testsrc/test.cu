@@ -1,10 +1,10 @@
 #include <iostream>
-#include "../hpp/MT.hpp"
+#include "../cuh/MT.cuh"
 
-#include "../testhpp/conf_test.hpp"
-#include "../testhpp/particles_test.hpp"
-#include "../testhpp/cells_test.hpp"
-#include "../testhpp/jamming_test.hpp"
+#include "../testcuh/conf_test.cuh"
+#include "../testcuh/particles_test.cuh"
+#include "../testcuh/cells_test.cuh"
+#include "../testcuh/jamming_test.cuh"
 
 int ID;
 int Np;

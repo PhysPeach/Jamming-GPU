@@ -1,4 +1,4 @@
-#include "../testhpp/jamming_test.hpp"
+#include "../testcuh/jamming_test.cuh"
 
 namespace PhysPeach{
     void createJammingTest(){

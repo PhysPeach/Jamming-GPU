@@ -1,11 +1,11 @@
-#ifndef CELLS_TEST_HPP
-#define CELLS_TEST_HPP
+#ifndef CELLS_TEST_CUH
+#define CELLS_TEST_CUH
 
 #include <iostream>
 #include <assert.h>
 
-#include "../hpp/particles.hpp"
-#include "../hpp/cells.hpp"
+#include "../cuh/particles.cuh"
+#include "../cuh/cells.cuh"
 
 namespace PhysPeach{
     //cellsTest

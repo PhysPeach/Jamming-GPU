@@ -1,10 +1,10 @@
-#ifndef CONF_TEST_HPP
-#define CONF_TEST_HPP
+#ifndef CONF_TEST_CUH
+#define CONF_TEST_CUH
 
 #include <iostream>
 #include <assert.h>
 
-#include "../hpp/conf.hpp"
+#include "../cuh/conf.cuh"
 
 namespace PhysPeach{
     void powIntTest();

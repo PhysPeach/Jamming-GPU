@@ -1,4 +1,4 @@
-#include "../hpp/cells.hpp"
+#include "../cuh/cells.cuh"
 
 namespace PhysPeach{
     //cells

@@ -1,10 +1,10 @@
-#ifndef JAMMING_TEST_HPP
-#define JAMMING_TEST_HPP
+#ifndef JAMMING_TEST_CUH
+#define JAMMING_TEST_CUH
 
 #include <iostream>
 #include <assert.h>
 
-#include "../hpp/jamming.hpp"
+#include "../cuh/jamming.cuh"
 
 namespace PhysPeach{
     void createJammingTest();

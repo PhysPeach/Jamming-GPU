@@ -1,4 +1,4 @@
-#include "../testhpp/conf_test.hpp"
+#include "../testcuh/conf_test.cuh"
 
 namespace PhysPeach{
     void powIntTest(){

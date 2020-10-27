@@ -1,5 +1,5 @@
-#ifndef CONF_HPP
-#define CONF_HPP
+#ifndef CONF_CUH
+#define CONF_CUH
 
 #include <math.h>
 

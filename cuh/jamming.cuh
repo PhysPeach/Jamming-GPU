@@ -1,14 +1,14 @@
-#ifndef JAMMING_HPP
-#define JAMMING_HPP
+#ifndef JAMMING_CUH
+#define JAMMING_CUH
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
 #include <math.h>
-#include "../hpp/conf.hpp"
-#include "../hpp/particles.hpp"
-#include "../hpp/cells.hpp"
+#include "../cuh/conf.cuh"
+#include "../cuh/particles.cuh"
+#include "../cuh/cells.cuh"
 
 namespace PhysPeach{
     struct Jamming {

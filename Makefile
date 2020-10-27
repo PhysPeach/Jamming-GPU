@@ -1,11 +1,11 @@
-test: testsrc/test.o cpp/MT.o cpp/conf.o testcpp/conf_test.o cpp/particles.o testcpp/particles_test.o cpp/cells.o testcpp/cells_test.o cpp/jamming.o testcpp/jamming_test.o
-	g++ -o $@ $^
+test: testsrc/test.o cu/MT.o cu/conf.o testcu/conf_test.o cu/particles.o testcu/particles_test.o cu/cells.o testcu/cells_test.o cu/jamming.o testcu/jamming_test.o
+	nvcc -arch=sm_60 -o $@ $^
 
-findJamming: main/findJamming.o cpp/MT.o cpp/conf.o cpp/particles.o cpp/cells.o cpp/jamming.o
-	g++ -o $@ $^
+findJamming: main/findJamming.o cu/MT.o cu/conf.o cu/particles.o cu/cells.o cu/jamming.o
+	nvcc -arch=sm_60 -o $@ $^
 
-squeezeJamming: main/squeezeJamming.o cpp/MT.o cpp/conf.o cpp/particles.o cpp/cells.o cpp/jamming.o
-	g++ -o $@ $^
+squeezeJamming: main/squeezeJamming.o cu/MT.o cu/conf.o cu/particles.o cu/cells.o cu/jamming.o
+	nvcc -arch=sm_60 -o $@ $^
 
-%.o: %.cpp
-	g++ -o $@ -c $<
+%.o: %.cu
+	nvcc -arch=sm_60 -o $@ -c $<

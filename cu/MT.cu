@@ -50,7 +50,7 @@
    - change the file name "mt19937ar.c" -> "MT.h"
 */
 
-#include "../hpp/MT.hpp"
+#include "../cuh/MT.cuh"
 
 static unsigned long mt[MT_N]; /* the array for the state vector  */
 static int mti=MT_N+1; /* mti==MT_N+1 means mt[MT_N] is not initialized */

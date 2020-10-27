@@ -7,10 +7,10 @@
 #include <math.h>
 #include <string.h>
 
-#include "../hpp/MT.hpp"
-#include "../hpp/conf.hpp"
+#include "../cuh/MT.cuh"
+#include "../cuh/conf.cuh"
 
-#include "../hpp/cells.hpp"
+#include "../cuh/cells.cuh"
 
 namespace PhysPeach{
     struct Particles{

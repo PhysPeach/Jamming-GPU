@@ -3,8 +3,8 @@
 #include <fstream>
 #include <sstream>
 
-#include "../hpp/conf.hpp"
-#include "../hpp/jamming.hpp"
+#include "../cuh/conf.cuh"
+#include "../cuh/jamming.cuh"
 
 int ID;
 int Np;

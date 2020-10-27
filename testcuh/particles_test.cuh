@@ -1,10 +1,10 @@
-#ifndef PARTICLES_TEST_HPP
-#define PARTICLES_TEST_HPP
+#ifndef PARTICLES_TEST_CUH
+#define PARTICLES_TEST_CUH
 
 #include <iostream>
 #include <assert.h>
 
-#include "../hpp/particles.hpp"
+#include "../cuh/particles.cuh"
 
 namespace PhysPeach{
     void createParticlesTest();

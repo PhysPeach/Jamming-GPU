@@ -1,4 +1,4 @@
-#include "../testhpp/particles_test.hpp"
+#include "../testcuh/particles_test.cuh"
 #include <fstream>
 
 namespace PhysPeach{

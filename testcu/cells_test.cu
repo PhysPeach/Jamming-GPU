@@ -1,4 +1,4 @@
-#include "../testhpp/cells_test.hpp"
+#include "../testcuh/cells_test.cuh"
 
 namespace PhysPeach{
     //cellsTest

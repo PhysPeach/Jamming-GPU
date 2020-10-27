@@ -1,4 +1,4 @@
-#include "../hpp/jamming.hpp"
+#include "../cuh/jamming.cuh"
 
 namespace PhysPeach{
     double L(Jamming* jam){
