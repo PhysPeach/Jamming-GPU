@@ -12,7 +12,7 @@
 namespace PhysPeach{
     void createParticlesTest();
     void powerParticlesTest();
-    //void convergedFireTest();
+    void convergedFireTest();
     //void updateMemTest();
     //void modifyVelocitiesTest();
     //void UandPTest();

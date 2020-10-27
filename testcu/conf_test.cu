@@ -28,36 +28,36 @@ namespace PhysPeach{
     void addReductionTest(){
         double *arr, *arr_dev[2];
         double sum;
-        arr = (double*)malloc(100000 * sizeof(double));
-        cudaMalloc((void**)&arr_dev[0], 100000 * sizeof(double));
-        cudaMalloc((void**)&arr_dev[1], 100000 * sizeof(double));
+        arr = (double*)malloc(10000 * sizeof(double));
+        cudaMalloc((void**)&arr_dev[0], 10000 * sizeof(double));
+        cudaMalloc((void**)&arr_dev[1], 10000 * sizeof(double));
         
-        for(int i = 0; i < 100000; i++){
+        for(int i = 0; i < 10000; i++){
             arr[i] = 1.;
         }
         int flip = 0;
-        cudaMemcpy(arr_dev[0], arr, 100000 * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(arr_dev[0], arr, 10000 * sizeof(double), cudaMemcpyHostToDevice);
         int remain;
-        for(int len = 100000; len > 1; len = remain){
+        for(int len = 10000; len > 1; len = remain){
             remain = (len+NT-1)/NT;
             flip = !flip;
             addReduction<<<remain,NT>>>(arr_dev[flip], arr_dev[!flip], len);
         }
         cudaMemcpy(&sum, arr_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
-        assert(99999.5 < sum && sum < 100000.5);
+        assert(9999.5 < sum && sum < 10000.5);
 
-        for(int i = 0; i < 100000; i++){
+        for(int i = 0; i < 10000; i++){
             arr[i] = (double)i;
         }
         flip = 0;
-        cudaMemcpy(arr_dev[0], arr, 100000 * sizeof(double), cudaMemcpyHostToDevice);
-        for(int len = 100000; len > 1; len = remain){
+        cudaMemcpy(arr_dev[0], arr, 10000 * sizeof(double), cudaMemcpyHostToDevice);
+        for(int len = 10000; len > 1; len = remain){
             remain = (len+NT-1)/NT;
             flip = !flip;
             addReduction<<<remain,NT>>>(arr_dev[flip], arr_dev[!flip], len);
         }
         cudaMemcpy(&sum, arr_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
-        assert(4.9999e9 < sum && sum < 5.0001e9);
+        assert(4.99e7 < sum && sum < 5.01e7);
 
         cudaFree(arr_dev[0]);
         cudaFree(arr_dev[1]);
@@ -71,17 +71,17 @@ namespace PhysPeach{
         int NB;
 
         double *arr, *arr_dev;
-        arr = (double*)malloc(100000 * sizeof(double));
-        cudaMalloc((void**)&arr_dev, 100000 * sizeof(double));
-        for(int i = 0; i < 100000; i++){
+        arr = (double*)malloc(10000 * sizeof(double));
+        cudaMalloc((void**)&arr_dev, 10000 * sizeof(double));
+        for(int i = 0; i < 10000; i++){
             arr[i] = 1.;
         }
-        cudaMemcpy(arr_dev, arr, 100000 * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(arr_dev, arr, 10000 * sizeof(double), cudaMemcpyHostToDevice);
 
-        NB = (100000 + NT - 1)/NT;
-        multiplied<<<NB, NT>>>(arr_dev, 0.99, 100000);
-        cudaMemcpy(arr, arr_dev, 100000 * sizeof(double), cudaMemcpyDeviceToHost);
-        for(int i = 0; i < 100000; i++){
+        NB = (10000 + NT - 1)/NT;
+        multiplied<<<NB, NT>>>(arr_dev, 0.99, 10000);
+        cudaMemcpy(arr, arr_dev, 10000 * sizeof(double), cudaMemcpyDeviceToHost);
+        for(int i = 0; i < 10000; i++){
             assert(0.989 < arr[i] && arr[i] < 0.991);
         }
 
@@ -93,25 +93,25 @@ namespace PhysPeach{
 
     void glo_innerProductTest(){
         double *arr, *arr_dev[3];
-        arr = (double*)malloc(100000 * sizeof(double));
-        cudaMalloc((void**)&arr_dev[0], 100000 * sizeof(double));
-        cudaMalloc((void**)&arr_dev[1], 100000 * sizeof(double));
-        cudaMalloc((void**)&arr_dev[2], 100000 * sizeof(double));
+        arr = (double*)malloc(10000 * sizeof(double));
+        cudaMalloc((void**)&arr_dev[0], 10000 * sizeof(double));
+        cudaMalloc((void**)&arr_dev[1], 10000 * sizeof(double));
+        cudaMalloc((void**)&arr_dev[2], 10000 * sizeof(double));
 
-        for(int i = 0; i < 100000; i++){
+        for(int i = 0; i < 10000; i++){
             arr[i] = (double)(2*i);
         }
-        cudaMemcpy(arr_dev[1], arr, 100000 * sizeof(double), cudaMemcpyHostToDevice);
-        for(int i = 0; i < 100000; i++){
+        cudaMemcpy(arr_dev[1], arr, 10000 * sizeof(double), cudaMemcpyHostToDevice);
+        for(int i = 0; i < 10000; i++){
             arr[i] = (double)i;
         }
-        cudaMemcpy(arr_dev[2], arr, 100000 * sizeof(double), cudaMemcpyHostToDevice);
+        cudaMemcpy(arr_dev[2], arr, 10000 * sizeof(double), cudaMemcpyHostToDevice);
 
-        int NB = (100000 + NT - 1)/NT;
-        glo_innerProduct<<<NB, NT>>>(arr_dev[0], arr_dev[1], arr_dev[2], 100000);
-        cudaMemcpy(arr, arr_dev[0], 100000 * sizeof(double), cudaMemcpyDeviceToHost);
+        int NB = (10000 + NT - 1)/NT;
+        glo_innerProduct<<<NB, NT>>>(arr_dev[0], arr_dev[1], arr_dev[2], 10000);
+        cudaMemcpy(arr, arr_dev[0], 10000 * sizeof(double), cudaMemcpyDeviceToHost);
 
-        for(int i = 0; i < 100000; i++){
+        for(int i = 0; i < 10000; i++){
             assert((double)(2. * i) * (double)i - 0.1 < arr[i] && arr[i] < (double)(2. * i) * (double)i + 0.1);
         }
 
@@ -119,5 +119,32 @@ namespace PhysPeach{
         cudaFree(arr_dev[1]);
         cudaFree(arr_dev[2]);
         free(arr);
+    }
+
+    void absoluteTest(){
+
+        double *arr, *arr_dev, *arrabs_dev;
+        arr = (double*)malloc(D * 5000 * sizeof(double));
+        cudaMalloc((void**)&arr_dev, D * 5000 * sizeof(double));
+        cudaMalloc((void**)&arrabs_dev, 5000 * sizeof(double));
+        for(int i = 0; i < D * 5000; i++){
+            arr[i] = (double)i;
+        }
+        cudaMemcpy(arr_dev, arr, D * 5000 * sizeof(double), cudaMemcpyHostToDevice);
+        absolute<<<(D * 5000 + NT - 1)/NT, NT>>>(arrabs_dev, arr_dev, 5000);
+        cudaMemcpy(arr, arrabs_dev, 5000 * sizeof(double), cudaMemcpyDeviceToHost);
+        for(int i = 0; i < 5000; i++){
+            if(D == 2){
+                assert(sqrt((double)i*(double)i+((double)i + 5000.)*((double)i + 5000.)) - 0.1 < arr[i] && arr[i] < sqrt((double)i*(double)i+((double)i + 5000.)*((double)i + 5000.)) + 0.1);
+            }else if(D == 3){
+                assert(sqrt((double)i*(double)i+((double)i + 5000.)*((double)i + 5000.)+((double)i + 10000.)*((double)i + 10000.)) - 0.1 < arr[i] && arr[i] < sqrt((double)i*(double)i+((double)i + 5000.)*((double)i + 5000.)+((double)i + 10000.)*((double)i + 10000.)) + 0.1);
+            }
+        }
+
+        cudaFree(arrabs_dev);
+        cudaFree(arr_dev);
+        free(arr);
+
+        return;
     }
 }

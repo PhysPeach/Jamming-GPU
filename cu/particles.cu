@@ -67,6 +67,8 @@ namespace PhysPeach{
 
         cudaMalloc((void**)&p->power_dev[0], D * Np * sizeof(double));
         cudaMalloc((void**)&p->power_dev[1], D * Np * sizeof(double));
+        cudaMalloc((void**)&p->fabs_dev[0], Np * sizeof(double));
+        cudaMalloc((void**)&p->fabs_dev[1], Np * sizeof(double));
 
         NB = (D * Np+NT-1)/NT;
         init_genrand_kernel<<<NB,NT>>>((unsigned long long)genrand_int32(), p->rnd_dev);
@@ -116,6 +118,8 @@ namespace PhysPeach{
 
         cudaMalloc((void**)&p->power_dev[0], D * Np * sizeof(double));
         cudaMalloc((void**)&p->power_dev[1], D * Np * sizeof(double));
+        cudaMalloc((void**)&p->fabs_dev[0], Np * sizeof(double));
+        cudaMalloc((void**)&p->fabs_dev[1], Np * sizeof(double));
 
         NB = (Np+NT-1)/NT;
         init_genrand_kernel<<<NB,NT>>>((unsigned long long)genrand_int32(), p->rnd_dev);
@@ -147,6 +151,27 @@ namespace PhysPeach{
 
         cudaFree(p->power_dev[0]);
         cudaFree(p->power_dev[1]);
+        cudaFree(p->fabs_dev[0]);
+        cudaFree(p->fabs_dev[1]);
+
         return;
+    }
+
+    bool convergedFire(Particles *p){
+        double fmax = 3.0e-12;
+        int flip = 0;
+        absolute<<<(Np + NT - 1)/NT,NT>>>(p->fabs_dev[flip], p->f_dev, Np);
+        int remain;
+        for(int len = Np; len > 1; len = remain){
+            remain = (len+NT-1)/NT;
+            flip = !flip;
+            addReduction<<<remain,NT>>>(p->fabs_dev[flip], p->fabs_dev[!flip], len);
+        }
+        double fsum;
+        cudaMemcpy(&fsum, p->fabs_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
+        if(fsum > fmax * (double)Np){
+            return false;
+        }
+        return true;
     }
 }

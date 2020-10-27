@@ -74,4 +74,35 @@ namespace PhysPeach{
         
         return;
     }
+
+    void convergedFireTest(){
+        Particles p;
+        bool converged;
+
+        createParticles(&p);
+
+        converged = convergedFire(&p);
+        assert(converged);
+
+        double f = 1.0e-10 * D*Np;
+
+        f = 1.0e-10 * D*Np;
+        cudaMemcpy(&p.f_dev[0], &f, sizeof(double), cudaMemcpyHostToDevice);
+        converged = convergedFire(&p);
+        assert(!converged);
+
+        f = 1.0e-12 * D*Np;
+        cudaMemcpy(&p.f_dev[0], &f, sizeof(double), cudaMemcpyHostToDevice);
+        converged = convergedFire(&p);
+        assert(converged);
+
+        f = 3.0e-12 * D*Np;
+        cudaMemcpy(&p.f_dev[D*Np - 1], &f, sizeof(double), cudaMemcpyHostToDevice);
+        converged = convergedFire(&p);
+        assert(!converged);
+
+        deleteParticles(&p);
+
+        return;
+    }
 }

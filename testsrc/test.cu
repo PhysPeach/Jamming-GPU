@@ -26,11 +26,12 @@ int main(){
     PhysPeach::addReductionTest();
     PhysPeach::multipliedTest();
     PhysPeach::glo_innerProductTest();
+    PhysPeach::absoluteTest();
 
     //particles_test
     PhysPeach::createParticlesTest();
     PhysPeach::powerParticlesTest();
-    //PhysPeach::convergedFireTest();
+    PhysPeach::convergedFireTest();
     //PhysPeach::updateMemTest();
     //PhysPeach::modifyVelocitiesTest();
     //PhysPeach::UandPTest();

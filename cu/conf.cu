@@ -68,4 +68,16 @@ namespace PhysPeach{
             out_dev[i_global] = in1_dev[i_global] * in2_dev[i_global];
         }
     }
+
+    __global__ void absolute(double* abs_dev, double* vec, int len){
+        int i_global = blockIdx.x * blockDim.x + threadIdx.x;
+
+        if(i_global < len){
+            abs_dev[i_global] = 0.;
+            for(int d = 0; d < D; d++){
+                abs_dev[i_global] += vec[d*len + i_global] * vec[d*len + i_global];
+            }
+            abs_dev[i_global] = sqrt(abs_dev[i_global]);
+        }
+    }
 }
