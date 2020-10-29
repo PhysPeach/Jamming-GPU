@@ -58,5 +58,77 @@ namespace PhysPeach{
 
         return;
     }
+
     //listsTest
+    void createListsTest(){
+
+        Cells cells;
+        Lists lists;
+        createCells(&cells, 3.);
+        createLists(&lists, &cells);
+        assert(lists.Nl == (int)(3.2 * (int)(3. * (double)Np/ (double)powInt(3, D))));
+        deleteLists(&lists);
+        deleteCells(&cells);
+
+        createCells(&cells, 40.);
+        createLists(&lists, &cells);
+        assert(lists.Nl == (int)(3.2 * (int)(3. * (double)Np/ (double)powInt(12, D))));
+        deleteLists(&lists);
+        deleteCells(&cells);
+
+        return;
+    }
+
+    void increaseNlTest(){
+        Cells cells;
+        Lists lists;
+
+        createCells(&cells, 40.);
+        createLists(&lists, &cells);
+
+        assert(lists.Nl == (int)(3.2 * (int)(3. * (double)Np/ (double)powInt(12, D))));
+        increaseNl(&lists);
+        assert(lists.Nl == (int)(1.4 * (int)(3.2 * (int)(3. * (double)Np/ (double)powInt(12, D)))));
+
+        deleteLists(&lists);
+        deleteCells(&cells);
+
+        return;
+    }
+
+    void updateListsTest(){
+
+        Cells cells;
+        Lists lists;
+
+        if(Np <= 100){
+            //test it in small Np
+            double *x;
+            x = (double*)malloc(D*Np*sizeof(double));
+            for(int par1 = 0; par1 < D*Np; par1++){
+                x[par1] = 1.;
+            }
+            createCells(&cells, 10.);
+            createLists(&lists, &cells);
+            updateCells(&cells, 10., x);
+            updateLists(&lists, &cells, 10., x);
+            assert(lists.Nl == Np);
+            deleteLists(&lists);
+            deleteCells(&cells);
+            free(x);
+        }
+
+        Particles p;
+        createParticles(&p);
+        double L = pow(p.packing/Phi_init, 1./(double)D);
+        createCells(&cells, L);
+        createLists(&lists, &cells);
+        updateCells(&cells, L, p.x);
+        updateLists(&lists, &cells, L, p.x_dev);
+        deleteLists(&lists);
+        deleteCells(&cells);
+        deleteParticles(&p);
+
+        return;
+    }
 }

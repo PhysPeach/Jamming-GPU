@@ -18,7 +18,7 @@ namespace PhysPeach{
     void updateCells(Cells*, double, double*);
 
     struct Lists{
-        int *list;
+        int *list_dev;
         int Nl;
     };
     void createLists(Lists*, Cells*);

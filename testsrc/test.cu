@@ -44,9 +44,9 @@ int main(){
     PhysPeach::updateCellsTest();
 
     //lists_test
-    //PhysPeach::createListsTest();
-    //PhysPeach::increaseNlTest();
-    //PhysPeach::updateListsTest(); //memory warning: do it in small Np
+    PhysPeach::createListsTest();
+    PhysPeach::increaseNlTest();
+    PhysPeach::updateListsTest(); //memory warning: do it in small Np
 
     //jamming_test
     //PhysPeach::createJammingTest();

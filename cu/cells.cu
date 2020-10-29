@@ -70,5 +70,106 @@ namespace PhysPeach{
     }
 
     //lists
+    void createLists(Lists *lists, Cells *cells){
+        lists->Nl = (int)(3.2 * (double)cells->Nc);
+
+        int NoL = lists->Nl * Np;
+        cudaMalloc((void**)&lists->list_dev, NoL * sizeof(int));
+        return;
+    }
     
+    void deleteLists(Lists *lists){
+        cudaFree(lists->list_dev);
+        return;
+    }
+
+    void increaseNl(Lists *lists){
+        lists->Nl = (int)(1.4 * lists->Nl);
+        int NoL = lists->Nl * Np;
+        cudaFree(lists->list_dev);
+        cudaMalloc((void**)&lists->list_dev, NoL * sizeof(int));
+        return;
+    }
+
+    __device__ int fix(int i, int M) {
+	    if (i < 0) i += M;
+	    if (i >= M) i -= M;
+
+	    return i;
+    }
+    __global__ void glo_putParticlesIntoLists(int *list_dev, int nl, int *cell_dev, int numOfCellsPerSide, int nc, double *x_dev, double L, int np){
+        int i_global = blockIdx.x * blockDim.x + threadIdx.x;
+
+        int c1[D], c2[D], c3[D];
+        int numOfParticlesInCell;
+        double Lc = L/(double)numOfCellsPerSide;
+        double Lh = 0.5 * L;
+
+        double x1[D];
+        int par2;
+        double dx[D], dr;
+
+        int counter;
+        if(i_global < np){
+            for(int d = 0; d < D; d++){
+                x1[d] = x_dev[d*np+i_global];
+            }
+            c1[0] = (x1[0] + Lh)/Lc;
+            c1[1] = (x1[1] + Lh)/Lc;
+            if(c1[0] >= numOfCellsPerSide){c1[0] -= numOfCellsPerSide;}
+            if(c1[0] < 0){c1[0] += numOfCellsPerSide;}
+            if(c1[1] >= numOfCellsPerSide){c1[1] -= numOfCellsPerSide;}
+            if(c1[1] < 0){c1[0] += numOfCellsPerSide;}
+    
+            for(c2[0] = c1[0]-1; c2[0] <= c1[0]+1; c2[0]++){
+                c3[0] = fix(c2[0], numOfCellsPerSide);
+                for(c2[1]= c1[1]-1; c2[1] <= c1[1]+1; c2[1]++){
+                    c3[1] = fix(c2[1], numOfCellsPerSide);
+                    numOfParticlesInCell = cell_dev[(c3[0]*numOfCellsPerSide+c3[1])*nc];
+                    for(int k = 1; k <= numOfParticlesInCell;k++){
+                        par2 = cell_dev[(c3[0]*numOfCellsPerSide+c3[1])*nc + k];
+                        if(par2 > i_global){
+                            dr = 0.;
+                            for(int d = 0; d < D; d++){
+                                dx[d] = x1[d] - x_dev[d*np+par2];
+                                if(dx[d] < -Lh) dx[d] += L;
+                                if(dx[d] > Lh) dx[d] -= L;
+                                dr += dx[d] * dx[d];
+                            }
+                            if(dr < 4 * a_max * a_max){
+                                counter = 1 + atomicAdd(&list_dev[i_global*nl], 1);
+                                //if(list_dev[par1*nl] >= nl){
+                                //    return false;
+                                //}
+                                list_dev[i_global*nl + counter] = par2;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    bool putParticlesIntoLists(Lists *lists, Cells *cells, double L, double* x_dev){
+        int NoL = lists->Nl * Np;
+        fillSameNum_int<<<(NoL + NT - 1)/NT, NT>>>(lists->list_dev, 0, NoL);
+        glo_putParticlesIntoLists<<<(Np + NT - 1)/NT, NT>>>(lists->list_dev, lists->Nl, cells->cell_dev, cells->numOfCellsPerSide, cells->Nc, x_dev, L, Np);
+        return true;
+    }
+
+    void updateLists(Lists *lists, Cells *cells, double L, double* x_dev){
+        bool success = false;
+        success = putParticlesIntoLists(lists, cells, L, x_dev);
+        while (!success){
+            std::cout << "hi" << std::endl;
+            increaseNl(lists);
+            success = putParticlesIntoLists(lists, cells, L, x_dev);
+        }
+        return;
+    }
+
+    void updateCellList(Cells *cells, Lists *lists, double L, double* x_dev){
+        updateCells(cells, L, x_dev);
+        updateLists(lists, cells, L, x_dev);
+        return;
+    }
 }
