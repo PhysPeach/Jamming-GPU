@@ -30,6 +30,7 @@ namespace PhysPeach{
     void setZero(T*, int);
 
     //global
+    __global__ void fillSameNum_int(int*, int, int);
     __global__ void addReduction(double*, double*, int);
     __global__ void multiplied(double*, double , int);
     __global__ void glo_innerProduct(double*, double*, double*, int);

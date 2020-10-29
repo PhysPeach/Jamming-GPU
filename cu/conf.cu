@@ -29,6 +29,13 @@ namespace PhysPeach{
     template void setZero<double>(double*, int);
 
     //device
+    __global__ void fillSameNum_int(int *arr, int a, int len){
+        int i_global = blockIdx.x * blockDim.x + threadIdx.x;
+        if(i_global < len){
+            arr[i_global] = a;
+        }
+    }
+
     __global__ void addReduction(double *out, double *in, int len){
         int i_block = blockIdx.x;
         int i_local = threadIdx.x;

@@ -41,7 +41,7 @@ int main(){
     //cells_test
     PhysPeach::createCellsTest();
     PhysPeach::increaseNcTest();
-    //PhysPeach::updateCellsTest();
+    PhysPeach::updateCellsTest();
 
     //lists_test
     //PhysPeach::createListsTest();

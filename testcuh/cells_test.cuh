@@ -11,7 +11,7 @@ namespace PhysPeach{
     //cellsTest
     void createCellsTest();
     void increaseNcTest();
-    //void updateCellsTest();
+    void updateCellsTest();
 
     //listsTest
     //void createListsTest();

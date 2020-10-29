@@ -29,5 +29,34 @@ namespace PhysPeach{
 
         return;
     }
+
+    void updateCellsTest(){
+
+        Cells cells;
+
+        if(Np <= 100){
+            //test it in small Np
+            double *x;
+            x = (double*)malloc(D*Np*sizeof(double));
+            for(int par1 = 0; par1 < D*Np; par1++){
+                x[par1] = 1.;
+            }
+            createCells(&cells, 10.);
+            updateCells(&cells, 10., x);
+            assert(cells.Nc == Np+1);
+            deleteCells(&cells);
+            free(x);
+        }
+
+        Particles p;
+        createParticles(&p);
+        double L = pow(p.packing/Phi_init, 1./(double)D);
+        createCells(&cells, L);
+        updateCells(&cells, L, p.x_dev);
+        deleteCells(&cells);
+        deleteParticles(&p);
+
+        return;
+    }
     //listsTest
 }
