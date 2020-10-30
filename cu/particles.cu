@@ -5,31 +5,40 @@ namespace PhysPeach{
         int i_global = blockIdx.x * blockDim.x + threadIdx.x;
 
         double U1 = 0.;
+        int par1[2], par2;
+        int kstart[2], kend[2];
         double diam1, x1[D];
-        int par2;
         double xij[D], rij2, diamij, r_aij;
         double Lh = 0.5 * L;
-        int numOfParticlesInList;
 
         if(i_global < np){
-            diam1 = diam_dev[i_global];
-            for(int d = 0; d < D; d++){
-                x1[d] = x_dev[d*np + i_global];
-            }
-            numOfParticlesInList = list_dev[i_global * nl];
-            for(int k = 1; k <= numOfParticlesInList; k++){
-                par2 = list_dev[i_global * nl + k];
-                diamij = 0.5 * (diam1 + diam_dev[par2]);
-                rij2 = 0.;
+            par1[0] = i_global;
+            kend[0] = list_dev[par1[0] * nl] / 2;
+            kstart[0] = 1;
+            par1[1] = np - 1 - i_global;
+            kend[1] = list_dev[par1[1] * nl];
+            kstart[1] = 1 + kend[1] / 2;
+            
+            for(int i = 0; i < 2; i++){
+                diam1 = diam_dev[par1[i]];
                 for(int d = 0; d < D; d++){
-                    xij[d] = x1[d] - x_dev[d*np + par2];
-                    if (xij[d] > Lh){xij[d] -= L;}
-                    if (xij[d] < -Lh){xij[d] += L;}
-                    rij2 += xij[d] * xij[d];
+                    x1[d] = x_dev[d*np + par1[i]];
                 }
-                if(0 < rij2 && rij2 < diamij * diamij){
-                    r_aij = sqrt(rij2)/diamij;
-                    U1 += 0.5 * (1 - r_aij) * (1 - r_aij);
+
+                for(int k = kstart[i]; k <= kend[i]; k++){
+                    par2 = list_dev[par1[i] * nl + k];
+                    diamij = 0.5 * (diam1 + diam_dev[par2]);
+                    rij2 = 0.;
+                    for(int d = 0; d < D; d++){
+                        xij[d] = x1[d] - x_dev[d*np + par2];
+                        if (xij[d] > Lh){xij[d] -= L;}
+                        if (xij[d] < -Lh){xij[d] += L;}
+                        rij2 += xij[d] * xij[d];
+                    }
+                    if(0 < rij2 && rij2 < diamij * diamij){
+                        r_aij = sqrt(rij2)/diamij;
+                        U1 += 0.5 * (1 - r_aij) * (1 - r_aij);
+                    }
                 }
             }
             Upart[i_global] = U1;
@@ -53,32 +62,40 @@ namespace PhysPeach{
         int i_global = blockIdx.x * blockDim.x + threadIdx.x;
 
         double P1 = 0.;
+        int par1[2], par2;
+        int kstart[2], kend[2];
         double diam1, x1[D];
-        int par2;
         double xij[D], rij2, diamij, rij, f_rij;
         double Lh = 0.5 * L;
-        int numOfParticlesInList;
 
         if(i_global < np){
-            diam1 = diam_dev[i_global];
-            for(int d = 0; d < D; d++){
-                x1[d] = x_dev[d*np + i_global];
-            }
-            numOfParticlesInList = list_dev[i_global * nl];
-            for(int k = 1; k <= numOfParticlesInList; k++){
-                par2 = list_dev[i_global * nl + k];
-                diamij = 0.5 * (diam1 + diam_dev[par2]);
-                rij2 = 0.;
+            par1[0] = i_global;
+            kend[0] = list_dev[par1[0] * nl] / 2;
+            kstart[0] = 1;
+            par1[1] = np - 1 - i_global;
+            kend[1] = list_dev[par1[1] * nl];
+            kstart[1] = 1 + kend[1] / 2;
+            
+            for(int i = 0; i < 2; i++){
+                diam1 = diam_dev[par1[i]];
                 for(int d = 0; d < D; d++){
-                    xij[d] = x1[d] - x_dev[d*np + par2];
-                    if (xij[d] > Lh){xij[d] -= L;}
-                    if (xij[d] < -Lh){xij[d] += L;}
-                    rij2 += xij[d] * xij[d];
+                    x1[d] = x_dev[d*np + par1[i]];
                 }
-                if(0 < rij2 && rij2 < diamij * diamij){
-                    rij = sqrt(rij2);
-                    f_rij = 1/(rij * diamij) - 1/(diamij * diamij);
-                    P1 += 0.5 * f_rij * rij2;
+                for(int k = kstart[i]; k <= kend[i]; k++){
+                    par2 = list_dev[par1[i] * nl + k];
+                    diamij = 0.5 * (diam1 + diam_dev[par2]);
+                    rij2 = 0.;
+                    for(int d = 0; d < D; d++){
+                        xij[d] = x1[d] - x_dev[d*np + par2];
+                        if (xij[d] > Lh){xij[d] -= L;}
+                        if (xij[d] < -Lh){xij[d] += L;}
+                        rij2 += xij[d] * xij[d];
+                    }
+                    if(0 < rij2 && rij2 < diamij * diamij){
+                        rij = sqrt(rij2);
+                        f_rij = 1/(rij * diamij) - 1/(diamij * diamij);
+                        P1 += 0.5 * f_rij * rij2;
+                    }
                 }
             }
             Ppart[i_global] = P1;
