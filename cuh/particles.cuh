@@ -29,8 +29,7 @@ namespace PhysPeach{
         double *f_dev;
         curandState *rnd_dev;
 
-        double *power_dev[2];
-        double *fabs_dev[2];
+        double *reduction_dev[2];
     };
     double K(Particles*);
     double U(Particles*, double, Lists*);

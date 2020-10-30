@@ -122,4 +122,26 @@ namespace PhysPeach{
         deleteParticles(&p);
         return;
     }
+
+    void UandPTest(){
+        Particles p;
+        Cells cells;
+        Lists lists;
+
+        createParticles(&p);
+        double L = pow(p.packing/Phi_init, 1./(double)D);
+        createCells(&cells, L);
+        createLists(&lists, &cells);
+        updateCells(&cells, L, p.x_dev);
+        updateLists(&lists, &cells, L, p.x_dev);
+
+        std::cout << "U: " << U(&p, L, &lists) << std::endl;
+        std::cout << "P: " << P(&p, L, &lists) << std::endl;
+
+        deleteLists(&lists);
+        deleteCells(&cells);
+        deleteParticles(&p);
+
+        return;
+    }
 }

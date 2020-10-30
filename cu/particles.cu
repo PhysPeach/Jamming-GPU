@@ -1,17 +1,116 @@
 #include "../cuh/particles.cuh"
 
 namespace PhysPeach{
+    __global__ void glo_U(double* Upart, double *diam_dev, double *x_dev, double L, int *list_dev, int nl, int np){
+        int i_global = blockIdx.x * blockDim.x + threadIdx.x;
+
+        double U1 = 0.;
+        double diam1, x1[D];
+        int par2;
+        double xij[D], rij2, diamij, r_aij;
+        double Lh = 0.5 * L;
+        int numOfParticlesInList;
+
+        if(i_global < np){
+            diam1 = diam_dev[i_global];
+            for(int d = 0; d < D; d++){
+                x1[d] = x_dev[d*np + i_global];
+            }
+            numOfParticlesInList = list_dev[i_global * nl];
+            for(int k = 1; k <= numOfParticlesInList; k++){
+                par2 = list_dev[i_global * nl + k];
+                diamij = 0.5 * (diam1 + diam_dev[par2]);
+                rij2 = 0.;
+                for(int d = 0; d < D; d++){
+                    xij[d] = x1[d] - x_dev[d*np + par2];
+                    if (xij[d] > Lh){xij[d] -= L;}
+                    if (xij[d] < -Lh){xij[d] += L;}
+                    rij2 += xij[d] * xij[d];
+                }
+                if(0 < rij2 && rij2 < diamij * diamij){
+                    r_aij = sqrt(rij2)/diamij;
+                    U1 += 0.5 * (1 - r_aij) * (1 - r_aij);
+                }
+            }
+            Upart[i_global] = U1;
+        }
+    }
+    double U(Particles *p, double L, Lists* lists){
+        int flip = 0;
+        glo_U<<<(Np + NT - 1)/NT, NT>>>(p->reduction_dev[flip], p->diam_dev, p->x_dev, L, lists->list_dev, lists->Nl, Np);
+        int remain;
+        for(int len = Np; len > 1; len = remain){
+            remain = (len+NT-1)/NT;
+            flip = !flip;
+            addReduction<<<remain,NT>>>(p->reduction_dev[flip], p->reduction_dev[!flip], len);
+        }
+        double U;
+        cudaMemcpy(&U, p->reduction_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
+        return U/(double)Np;
+    }
+
+    __global__ void glo_P(double* Ppart, double *diam_dev, double* x_dev, double L, int *list_dev, int nl, int np){
+        int i_global = blockIdx.x * blockDim.x + threadIdx.x;
+
+        double P1 = 0.;
+        double diam1, x1[D];
+        int par2;
+        double xij[D], rij2, diamij, rij, f_rij;
+        double Lh = 0.5 * L;
+        int numOfParticlesInList;
+
+        if(i_global < np){
+            diam1 = diam_dev[i_global];
+            for(int d = 0; d < D; d++){
+                x1[d] = x_dev[d*np + i_global];
+            }
+            numOfParticlesInList = list_dev[i_global * nl];
+            for(int k = 1; k <= numOfParticlesInList; k++){
+                par2 = list_dev[i_global * nl + k];
+                diamij = 0.5 * (diam1 + diam_dev[par2]);
+                rij2 = 0.;
+                for(int d = 0; d < D; d++){
+                    xij[d] = x1[d] - x_dev[d*np + par2];
+                    if (xij[d] > Lh){xij[d] -= L;}
+                    if (xij[d] < -Lh){xij[d] += L;}
+                    rij2 += xij[d] * xij[d];
+                }
+                if(0 < rij2 && rij2 < diamij * diamij){
+                    rij = sqrt(rij2);
+                    f_rij = 1/(rij * diamij) - 1/(diamij * diamij);
+                    P1 += 0.5 * f_rij * rij2;
+                }
+            }
+            Ppart[i_global] = P1;
+        }
+    }
+    double P(Particles *p, double L, Lists* lists){
+        int flip = 0;
+        glo_P<<<(Np + NT - 1)/NT, NT>>>(p->reduction_dev[flip], p->diam_dev, p->x_dev, L, lists->list_dev, lists->Nl, Np);
+        int remain;
+        for(int len = Np; len > 1; len = remain){
+            remain = (len+NT-1)/NT;
+            flip = !flip;
+            addReduction<<<remain,NT>>>(p->reduction_dev[flip], p->reduction_dev[!flip], len);
+        }
+        double P;
+        cudaMemcpy(&P, p->reduction_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
+
+        double Vol = powInt(L, D);
+        return P /= Vol;
+    }
+
     double powerParticles(Particles* p){
         int flip = 0;
-        glo_innerProduct<<<(D * Np + NT - 1)/NT, NT>>>(p->power_dev[flip], p->v_dev, p->f_dev, D * Np);
+        glo_innerProduct<<<(D * Np + NT - 1)/NT, NT>>>(p->reduction_dev[flip], p->v_dev, p->f_dev, D * Np);
         int remain;
         for(int len = D * Np; len > 1; len = remain){
             remain = (len+NT-1)/NT;
             flip = !flip;
-            addReduction<<<remain,NT>>>(p->power_dev[flip], p->power_dev[!flip], len);
+            addReduction<<<remain,NT>>>(p->reduction_dev[flip], p->reduction_dev[!flip], len);
         }
         double power;
-        cudaMemcpy(&power, p->power_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
+        cudaMemcpy(&power, p->reduction_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
         return power;
     }
 
@@ -64,10 +163,8 @@ namespace PhysPeach{
         cudaMalloc((void**)&p->f_dev, D * Np * sizeof(double));
         cudaMalloc((void**)&p->rnd_dev, D * Np * sizeof(curandState));
 
-        cudaMalloc((void**)&p->power_dev[0], D * Np * sizeof(double));
-        cudaMalloc((void**)&p->power_dev[1], D * Np * sizeof(double));
-        cudaMalloc((void**)&p->fabs_dev[0], Np * sizeof(double));
-        cudaMalloc((void**)&p->fabs_dev[1], Np * sizeof(double));
+        cudaMalloc((void**)&p->reduction_dev[0], D * Np * sizeof(double));
+        cudaMalloc((void**)&p->reduction_dev[1], D * Np * sizeof(double));
 
         NB = (D * Np+NT-1)/NT;
         init_genrand_kernel<<<NB,NT>>>((unsigned long long)genrand_int32(), p->rnd_dev);
@@ -112,10 +209,8 @@ namespace PhysPeach{
         cudaMalloc((void**)&p->f_dev, D * Np * sizeof(double));
         cudaMalloc((void**)&p->rnd_dev, D * Np * sizeof(curandState));
 
-        cudaMalloc((void**)&p->power_dev[0], D * Np * sizeof(double));
-        cudaMalloc((void**)&p->power_dev[1], D * Np * sizeof(double));
-        cudaMalloc((void**)&p->fabs_dev[0], Np * sizeof(double));
-        cudaMalloc((void**)&p->fabs_dev[1], Np * sizeof(double));
+        cudaMalloc((void**)&p->reduction_dev[0], D * Np * sizeof(double));
+        cudaMalloc((void**)&p->reduction_dev[1], D * Np * sizeof(double));
 
         NB = (Np+NT-1)/NT;
         init_genrand_kernel<<<NB,NT>>>((unsigned long long)genrand_int32(), p->rnd_dev);
@@ -143,10 +238,8 @@ namespace PhysPeach{
         cudaFree(p->f_dev);
         cudaFree(p->rnd_dev);
 
-        cudaFree(p->power_dev[0]);
-        cudaFree(p->power_dev[1]);
-        cudaFree(p->fabs_dev[0]);
-        cudaFree(p->fabs_dev[1]);
+        cudaFree(p->reduction_dev[0]);
+        cudaFree(p->reduction_dev[1]);
 
         return;
     }
@@ -179,15 +272,15 @@ namespace PhysPeach{
     bool convergedFire(Particles *p){
         double fmax = 3.0e-12;
         int flip = 0;
-        absolute<<<(Np + NT - 1)/NT,NT>>>(p->fabs_dev[flip], p->f_dev, Np);
+        absolute<<<(Np + NT - 1)/NT,NT>>>(p->reduction_dev[flip], p->f_dev, Np);
         int remain;
         for(int len = Np; len > 1; len = remain){
             remain = (len+NT-1)/NT;
             flip = !flip;
-            addReduction<<<remain,NT>>>(p->fabs_dev[flip], p->fabs_dev[!flip], len);
+            addReduction<<<remain,NT>>>(p->reduction_dev[flip], p->reduction_dev[!flip], len);
         }
         double fsum;
-        cudaMemcpy(&fsum, p->fabs_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
+        cudaMemcpy(&fsum, p->reduction_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
         if(fsum > fmax * (double)Np){
             return false;
         }
