@@ -24,6 +24,7 @@ int main(){
     PhysPeach::powIntTest();
     PhysPeach::setZeroTest();
     PhysPeach::addReductionTest();
+    PhysPeach::maxReductionTest();
     PhysPeach::multipliedTest();
     PhysPeach::glo_innerProductTest();
     PhysPeach::absoluteTest();
@@ -47,6 +48,9 @@ int main(){
     PhysPeach::createListsTest();
     PhysPeach::increaseNlTest();
     PhysPeach::updateListsTest(); //memory warning: do it in small Np
+
+    //cellList_test
+    PhysPeach::setUpdateFreqTest();
 
     //jamming_test
     //PhysPeach::createJammingTest();

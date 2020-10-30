@@ -66,6 +66,48 @@ namespace PhysPeach{
         return;
     }
 
+    void maxReductionTest(){
+        double *arr, *arr_dev[2];
+        double max;
+        arr = (double*)malloc(10000 * sizeof(double));
+        cudaMalloc((void**)&arr_dev[0], 10000 * sizeof(double));
+        cudaMalloc((void**)&arr_dev[1], 10000 * sizeof(double));
+        
+        arr[0] = 1.;
+        for(int i = 1; i < 10000; i++){
+            arr[i] = 0.;
+        }
+        int flip = 0;
+        cudaMemcpy(arr_dev[0], arr, 10000 * sizeof(double), cudaMemcpyHostToDevice);
+        int remain;
+        for(int len = 10000; len > 1; len = remain){
+            remain = (len+NT-1)/NT;
+            flip = !flip;
+            maxReduction<<<remain,NT>>>(arr_dev[flip], arr_dev[!flip], len);
+        }
+        cudaMemcpy(&max, arr_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
+        assert(0.999 < max && max < 1.001);
+
+        for(int i = 0; i < 10000; i++){
+            arr[i] = (double)i;
+        }
+        flip = 0;
+        cudaMemcpy(arr_dev[0], arr, 10000 * sizeof(double), cudaMemcpyHostToDevice);
+        for(int len = 10000; len > 1; len = remain){
+            remain = (len+NT-1)/NT;
+            flip = !flip;
+            maxReduction<<<remain,NT>>>(arr_dev[flip], arr_dev[!flip], len);
+        }
+        cudaMemcpy(&max, arr_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
+        assert(9998.999 < max && max < 9999.001);
+
+        cudaFree(arr_dev[0]);
+        cudaFree(arr_dev[1]);
+        free(arr);
+
+        return;
+    }
+
     void multipliedTest(){
 
         int NB;

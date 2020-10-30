@@ -9,8 +9,11 @@ namespace PhysPeach{
     struct Cells{
         int numOfCellsPerSide;
         int Nc;
+        int updateFreq;
 
         int *cell_dev;
+        double *vmax_dev[2];
+
     };
     void createCells(Cells*, double);
     void deleteCells(Cells*);
@@ -25,6 +28,9 @@ namespace PhysPeach{
     void deleteLists(Lists*);
     void increaseNl(Lists*);
     void updateLists(Lists*, Cells*, double, double*);
+
     void updateCellList(Cells*, Lists*, double, double*);
+    void setUpdateFreq(Cells*, double*);
+    inline void checkUpdateCellList(Cells*, Lists*, double, double* , double*);
 }
 #endif

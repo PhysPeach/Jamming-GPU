@@ -18,5 +18,7 @@ namespace PhysPeach{
     void increaseNlTest();
     void updateListsTest();
 
+    //cellListTest
+    void setUpdateFreqTest();
 }
 #endif

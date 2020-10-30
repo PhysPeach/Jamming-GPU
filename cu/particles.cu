@@ -97,7 +97,6 @@ namespace PhysPeach{
         int uniformity = (int)(pow(Np, 1./(double)D));
         createPosition<<<NB, NT>>>(p->x_dev, p->rnd_dev, uniformity, L, Np);
         cudaMemcpy(p->mem_dev, p->x_dev, D * Np * sizeof(double), cudaMemcpyDeviceToDevice);
-
         return;
     }
 

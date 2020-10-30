@@ -12,10 +12,16 @@ namespace PhysPeach{
 
         int NoC = powInt(cells->numOfCellsPerSide, D)*cells->Nc;
         cudaMalloc((void**)&cells->cell_dev, NoC * sizeof(int));
+
+        cudaMalloc((void**)&cells->vmax_dev[0], D * Np * sizeof(double));
+        cudaMalloc((void**)&cells->vmax_dev[1], D * Np * sizeof(double));
+        cells->updateFreq = 1;
         return;
     }
 
     void deleteCells(Cells *cells){
+        cudaFree(cells->vmax_dev[0]);
+        cudaFree(cells->vmax_dev[1]);
         cudaFree(cells->cell_dev);
         return;
     }
@@ -167,9 +173,44 @@ namespace PhysPeach{
         return;
     }
 
-    void updateCellList(Cells *cells, Lists *lists, double L, double* x_dev){
+    void updateCellList(Cells *cells, Lists *lists, double L, double *x_dev){
         updateCells(cells, L, x_dev);
         updateLists(lists, cells, L, x_dev);
+        return;
+    }
+
+    void setUpdateFreq(Cells *cells, double *v_dev){
+        double vmax;
+        int flip = 0;
+
+        cudaMemcpy(cells->vmax_dev[flip], v_dev, D * Np * sizeof(double), cudaMemcpyDeviceToDevice);
+        int remain;
+        for(int len = D * Np; len > 1; len = remain){
+            remain = (len+NT-1)/NT;
+            flip = !flip;
+            maxReduction<<<remain, NT>>>(cells->vmax_dev[flip], cells->vmax_dev[!flip], len);
+        }
+        cudaMemcpy(&vmax, cells->vmax_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
+        if(vmax != 0.){
+            if(vmax < 0){
+                vmax *= -1.;
+            }
+            cells->updateFreq = (int)(0.5 * a_max/(vmax * dt_max));
+        }
+        else{
+            cells->updateFreq = 1;
+        }
+        return;
+    }
+
+    inline void checkUpdateCellList(Cells *cells, Lists *lists, double L, double *x_dev, double *v_dev){
+        static uint counter = 0;
+        counter++;
+        if(counter >= cells->updateFreq){
+            updateCellList(cells, lists, L, x_dev);
+            setUpdateFreq(cells, v_dev);
+            counter = 0;
+        }
         return;
     }
 }
