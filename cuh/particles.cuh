@@ -25,7 +25,6 @@ namespace PhysPeach{
         //device
         double *diam_dev;
         double *x_dev;
-        double *mem_dev;
         double *v_dev;
         double *f_dev;
         curandState *rnd_dev;

@@ -28,14 +28,6 @@ namespace PhysPeach{
             xav[d] /= Np * L;
             assert(-0.01 < xav[d] && xav[d] < 0.01);
         }
-
-        double *mem;
-        mem = (double*)malloc(D * Np * sizeof(double));
-        cudaMemcpy(mem, p.mem_dev, D * Np * sizeof(double), cudaMemcpyDeviceToHost);
-        for(int par1 = 0; par1 < D*Np; par1++){
-            assert(p.x[par1] == mem[par1]);
-        }
-        free(mem);
         deleteParticles(&p);
         return;
     }
