@@ -123,7 +123,7 @@ namespace PhysPeach{
         double L = pow(p.packing/Phi_init, 1./(double)D);
         createCells(&cells, L);
         createLists(&lists, &cells);
-        updateCells(&cells, L, p.x);
+        updateCells(&cells, L, p.x_dev);
         updateLists(&lists, &cells, L, p.x_dev);
         deleteLists(&lists);
         deleteCells(&cells);
