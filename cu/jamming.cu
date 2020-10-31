@@ -97,4 +97,22 @@ namespace PhysPeach{
         }
         return loop;
     }
+
+    int addDphi(Jamming* jam, double dphi){
+        static double Lstart = L(jam);
+        int loop;
+
+        jam->phi += dphi;
+        double Lend = L(jam);
+        multiplied<<<(D*Np + NT - 1)/NT, NT>>>(jam->p.x_dev, Lend/Lstart, D*Np);
+        Lstart = Lend;
+
+        if((jam->cells.numOfCellsPerSide > 3 && Lend/(double)jam->cells.numOfCellsPerSide < 2 * a_max) || 2 * a_max < Lend/(double)(1+jam->cells.numOfCellsPerSide)){
+            deleteCells(&jam->cells);
+            createCells(&jam->cells, Lend);
+            updateCellList(&jam->cells, &jam->lists, L(jam), jam->p.x_dev);
+        }
+        loop = fireJamming(jam);
+        return loop;
+    }
 }

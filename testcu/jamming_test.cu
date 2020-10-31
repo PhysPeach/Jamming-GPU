@@ -32,4 +32,19 @@ namespace PhysPeach{
         deleteJamming(&jam);
         return;
     }
+
+    void addDphiTest(){
+        Jamming jam;
+        double Phi = Phi_init;
+        createJamming(&jam);
+        fireJamming(&jam);
+        addDphi(&jam, 0.0001);
+        assert(Phi < jam.phi && jam.phi < Phi + 0.0002);
+        addDphi(&jam, -0.001);
+        assert(Phi-0.001 < jam.phi && jam.phi < Phi-0.001+0.0002);
+
+        deleteJamming(&jam);
+        
+        return;
+    }
 }
