@@ -66,11 +66,11 @@ int main(int argc, char** argv) {
         Pnow = P(&jam.p, L(&jam), &jam.lists);
         std::cout << "    " << jam.phi << ", " << U(&jam.p, L(&jam), &jam.lists) << ", " << Pnow << ", " << loop << std::endl;
     }
-    jam.phi = phimem;
+    phimem = jam.phi;
     cudaMemcpy(xmem_dev, jam.p.x_dev, D * Np * sizeof(double), cudaMemcpyDeviceToDevice);
     Pnow = P(&jam.p, L(&jam), &jam.lists);
 
-    std::cout << "    Squeeze from phi = " << jam.phi << " by dphi = " << 1.0e-6 << std::endl;
+    std::cout << "    Expand from phi = " << jam.phi << " by dphi = " << 1.0e-6 << std::endl;
     std::cout << "    phi, E, P, loop:" << std::endl;
     while (Pnow > 1.0e-8){
         phimem = jam.phi;
