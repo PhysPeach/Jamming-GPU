@@ -16,7 +16,7 @@ namespace PhysPeach{
 
         double *arr;
         arr = (double*)malloc(D*Np*sizeof(double));
-        cudaMemcpy(arr, jam.p.f_dev, D*Np*sizeof(double), cudamemcpyDeviceToHost);
+        cudaMemcpy(arr, jam.p.f_dev, D*Np*sizeof(double), cudaMemcpyDeviceToHost);
 
         double fsum = 0.;
         double f2;
@@ -27,7 +27,7 @@ namespace PhysPeach{
             }
             fsum += sqrt(f2);
         }
-        assert(fsum < 1.0e-13 * Np);
+        assert(fsum < 3.0e-12 * Np);
         free(arr);
         deleteJamming(&jam);
         return;

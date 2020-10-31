@@ -58,4 +58,43 @@ namespace PhysPeach{
         deleteCells(&jam->cells);
         return;
     }
+
+    int fireJamming(Jamming* jam){
+        int loop = 0;
+        double dt = dt_init;
+        double alpha = alpha_init;
+        double power;
+
+        bool converged = false;
+        int cp = 0;
+        fillSameNum_double<<<(D*Np + NT - 1)/NT, NT>>>(jam->p.v_dev, 0., D*Np);
+        while(!converged){
+            loop++;
+            updateParticles(&jam->p, L(jam), dt, &jam->lists);
+            checkUpdateCellList(&jam->cells, &jam->lists, L(jam), jam->p.x_dev, jam->p.v_dev);
+            converged = convergedFire(&jam->p);
+            power = powerParticles(&jam->p);
+            modifyVelocities<<<(Np + NT - 1)/NT, NT>>>(jam->p.v_dev, jam->p.f_dev, alpha, Np);
+            if(power < 0){
+                fillSameNum_double<<<(D*Np + NT - 1)/NT, NT>>>(jam->p.v_dev, 0., D*Np);
+                alpha = alpha_init;
+                dt *= 0.5;
+                cp = 0;
+            }else{
+                cp++;
+                if(cp > 5){
+                    dt *= 1.1;
+                    if(dt > dt_max){
+                        dt = dt_max;
+                    }
+                    alpha *= 0.99;
+                    cp = 0;
+                }
+            }
+            if(loop == 1000000){
+                std::cout << "dt: " << dt << std::endl;
+            }
+        }
+        return loop;
+    }
 }
