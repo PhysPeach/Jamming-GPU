@@ -36,6 +36,13 @@ namespace PhysPeach{
         }
     }
 
+    __global__ void fillSameNum_double(double *arr, double a, int len){
+        int i_global = blockIdx.x * blockDim.x + threadIdx.x;
+        if(i_global < len){
+            arr[i_global] = a;
+        }
+    }
+
     __global__ void addReduction(double *out, double *in, int len){
         int i_block = blockIdx.x;
         int i_local = threadIdx.x;

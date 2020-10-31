@@ -144,4 +144,34 @@ namespace PhysPeach{
 
         return;
     }
+
+    void updateParticlesTest(){
+        Particles p;
+        Cells cells;
+        Lists lists;
+
+        createParticles(&p);
+        double L = pow(p.packing/Phi_init, 1./(double)D);
+        createCells(&cells, L);
+        createLists(&lists, &cells);
+        updateCellList(&cells, &lists, L, p.x_dev);
+        setUpdateFreq(&cells, p.v_dev);
+
+        double E1, E2;
+        for(int i = 0; i < 10000; i++){
+            if(i == 1000){
+                E1 = K(&p) + U(&p, L, &lists);
+            }
+            updateParticles(&p, L, 0.001, &lists);
+            checkUpdateCellList(&cells, &lists, L, p.x_dev, p.v_dev);
+            //std::cout << i << " " << K(&p) + U(&p, L, &lists) << std::endl;
+        }
+        E2 = K(&p) + U(&p, L, &lists);
+        assert(-0.005 < E1 - E2 && E1 - E2 < 0.005);
+        
+        deleteLists(&lists);
+        deleteCells(&cells);
+        deleteParticles(&p);
+        return;
+    }
 }

@@ -1,6 +1,24 @@
 #include "../cuh/particles.cuh"
 
 namespace PhysPeach{
+    __global__ void glo_K(double* Kpart, double* v_dev, int len){
+        int i_global = blockIdx.x * blockDim.x + threadIdx.x;
+        if(i_global < len) Kpart[i_global] = v_dev[i_global] * v_dev[i_global];
+    }
+    double K(Particles *p){
+        int flip = 0;
+        glo_K<<<(D*Np + NT - 1)/NT, NT>>>(p->reduction_dev[flip], p->v_dev, D*Np);
+        int remain;
+        for(int len = Np; len > 1; len = remain){
+            remain = (len+NT-1)/NT;
+            flip = !flip;
+            addReduction<<<remain,NT>>>(p->reduction_dev[flip], p->reduction_dev[!flip], len);
+        }
+        double K;
+        cudaMemcpy(&K, p->reduction_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
+        return K/(2. * (double)Np);
+    }
+
     __global__ void glo_U(double* Upart, double *diam_dev, double *x_dev, double L, int *list_dev, int nl, int np){
         int i_global = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -115,6 +133,59 @@ namespace PhysPeach{
 
         double Vol = powInt(L, D);
         return P /= Vol;
+    }
+    __global__ void glo_updateForces(double* f_dev, double *diam_dev, double* x_dev, double L, int *list_dev, int nl, int np){
+        int i_global = blockIdx.x * blockDim.x + threadIdx.x;
+
+        int par1[2], par2;
+        int kstart[2], kend[2];
+        double diam1, x1[D], f1[D];
+        double xij[D], rij, rij2, diamij, f_rij;
+        double Lh = 0.5 * L;
+
+        if(i_global < np){
+            par1[0] = i_global;
+            kend[0] = list_dev[par1[0] * nl] / 2;
+            kstart[0] = 1;
+            par1[1] = np - 1 - i_global;
+            kend[1] = list_dev[par1[1] * nl];
+            kstart[1] = 1 + kend[1] / 2;
+            
+            for(int i = 0; i < 2; i++){
+                diam1 = diam_dev[par1[i]];
+                for(int d = 0; d < D; d++){
+                    x1[d] = x_dev[d*np + par1[i]];
+                    f1[d] = 0.;
+                }
+                for(int k = kstart[i]; k <= kend[i]; k++){
+                    par2 = list_dev[par1[i] * nl + k];
+                    diamij = 0.5 * (diam1 + diam_dev[par2]);
+                    rij2 = 0.;
+                    for(int d = 0; d < D; d++){
+                        xij[d] = x1[d] - x_dev[d*np + par2];
+                        if (xij[d] > Lh){xij[d] -= L;}
+                        if (xij[d] < -Lh){xij[d] += L;}
+                        rij2 += xij[d] * xij[d];
+                    }
+                    if(0 < rij2 && rij2 < diamij * diamij){
+                        rij = sqrt(rij2);
+                        f_rij = 1/(rij * diamij) - 1/(diamij * diamij);
+                        for(int d = 0; d < D; d++){
+                            f1[d] += f_rij * xij[d];
+                            atomicAdd(&f_dev[d*np+par2], -f_rij * xij[d]);
+                        }
+                    }
+                }
+                for(int d = 0; d < D; d++){
+                    atomicAdd(&f_dev[d*np+par1[i]], f1[d]);
+                }
+            }
+        }
+    }
+    void updateForces(Particles *p, double L, Lists* lists){
+        fillSameNum_double<<<(D*Np + NT - 1)/NT, NT>>>(p->f_dev, 0., D*Np);
+        glo_updateForces<<<(Np + NT - 1)/NT, NT>>>(p->f_dev, p->diam_dev, p->x_dev, L, lists->list_dev, lists->Nl, Np);
+        return;
     }
 
     double powerParticles(Particles* p){
@@ -257,6 +328,35 @@ namespace PhysPeach{
 
         cudaFree(p->reduction_dev[0]);
         cudaFree(p->reduction_dev[1]);
+
+        return;
+    }
+
+    __global__ void vEvo(double *v_dev, double *f_dev, double dt, int len){
+        int i_global = blockIdx.x * blockDim.x + threadIdx.x;
+        if(i_global < len){
+            v_dev[i_global] += dt * f_dev[i_global];
+        }
+    }
+    __global__ void xEvo(double *x_dev, double *v_dev, double *f_dev, double L, double dt, int np){
+        int i_global = blockIdx.x * blockDim.x + threadIdx.x;
+        double Lh = 0.5 * L;
+        double x[D];
+        if(i_global < np){
+            for(int d = 0; d < D; d++){
+                x[d] = x_dev[d*np+i_global] + dt * (v_dev[d*np+i_global] + 0.5 * dt * f_dev[d*np+i_global]);
+                if(x[d] > Lh){x[d] -= L;}
+                if(x[d] < -Lh){x[d] += L;}
+                x_dev[d*np+i_global] = x[d];
+            }
+        }
+    }
+    void updateParticles(Particles *p, double L, double dt, Lists *lists){
+
+        vEvo<<<(D*Np + NT - 1)/NT, NT>>>(p->v_dev, p->f_dev, 0.5 * dt, D*Np);
+        updateForces(p, L, lists);
+        vEvo<<<(D*Np + NT - 1)/NT, NT>>>(p->v_dev, p->f_dev, 0.5 * dt, D*Np);
+        xEvo<<<(Np + NT - 1)/NT, NT>>>(p->x_dev, p->v_dev, p->f_dev, L, dt, Np);
 
         return;
     }

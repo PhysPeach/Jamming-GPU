@@ -39,8 +39,7 @@ namespace PhysPeach{
     void createParticles(Particles*);
     void createParticles(Particles*, std::ifstream*);
     void deleteParticles(Particles*);
-    bool updateParticles(Particles*, double, double, Lists*);
-    bool updateMem(Particles*, double);
+    void updateParticles(Particles*, double, double, Lists*);
     __global__ void modifyVelocities(double*, double*, double , int);
     bool convergedFire(Particles*);
 }
