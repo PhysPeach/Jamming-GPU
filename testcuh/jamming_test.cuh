@@ -7,7 +7,7 @@
 #include "../cuh/jamming.cuh"
 
 namespace PhysPeach{
-    //void createJammingTest();
+    void createJammingTest();
     //void fireJammingTest();
     //void addDphiTest();
 }

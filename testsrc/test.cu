@@ -51,7 +51,7 @@ int main(){
     PhysPeach::setUpdateFreqTest();
 
     //jamming_test
-    //PhysPeach::createJammingTest();
+    PhysPeach::createJammingTest();
     //PhysPeach::fireJammingTest();
     //PhysPeach::addDphiTest();
 
