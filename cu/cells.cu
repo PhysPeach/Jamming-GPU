@@ -15,7 +15,7 @@ namespace PhysPeach{
 
         cudaMalloc((void**)&cells->vmax_dev[0], D * Np * sizeof(double));
         cudaMalloc((void**)&cells->vmax_dev[1], D * Np * sizeof(double));
-        cells->updateFreq = 1;
+        cells->updateFreq = 25;
         return;
     }
 
@@ -191,19 +191,20 @@ namespace PhysPeach{
             maxReduction<<<remain, NT>>>(cells->vmax_dev[flip], cells->vmax_dev[!flip], len);
         }
         cudaMemcpy(&vmax, cells->vmax_dev[flip], sizeof(double), cudaMemcpyDeviceToHost);
+        cells->updateFreq = 25;
         if(vmax != 0.){
             if(vmax < 0){
                 vmax *= -1.;
             }
             cells->updateFreq = (int)(0.5 * a_max/(vmax * dt_max));
         }
-        else{
-            cells->updateFreq = 1;
+        if(cells->updateFreq > 25){
+            cells->updateFreq = 25;
         }
         return;
     }
 
-    inline void checkUpdateCellList(Cells *cells, Lists *lists, double L, double *x_dev, double *v_dev){
+    void checkUpdateCellList(Cells *cells, Lists *lists, double L, double *x_dev, double *v_dev){
         static uint counter = 0;
         counter++;
         if(counter >= cells->updateFreq){

@@ -9,7 +9,7 @@ namespace PhysPeach{
         int flip = 0;
         glo_K<<<(D*Np + NT - 1)/NT, NT>>>(p->reduction_dev[flip], p->v_dev, D*Np);
         int remain;
-        for(int len = Np; len > 1; len = remain){
+        for(int len = D * Np; len > 1; len = remain){
             remain = (len+NT-1)/NT;
             flip = !flip;
             addReduction<<<remain,NT>>>(p->reduction_dev[flip], p->reduction_dev[!flip], len);

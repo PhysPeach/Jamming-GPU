@@ -139,7 +139,7 @@ namespace PhysPeach{
         double L = pow(p.packing/Phi_init, 1./(double)D);
         createCells(&cells, L);
         setUpdateFreq(&cells, p.v_dev);
-        assert(cells.updateFreq == 1);
+        assert(cells.updateFreq == 25);
         double v = 1.;
         cudaMemcpy(&p.v_dev[0], &v, sizeof(double), cudaMemcpyHostToDevice);
         setUpdateFreq(&cells, p.v_dev);

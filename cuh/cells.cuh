@@ -31,6 +31,6 @@ namespace PhysPeach{
 
     void updateCellList(Cells*, Lists*, double, double*);
     void setUpdateFreq(Cells*, double*);
-    inline void checkUpdateCellList(Cells*, Lists*, double, double* , double*);
+    void checkUpdateCellList(Cells*, Lists*, double, double* , double*);
 }
 #endif

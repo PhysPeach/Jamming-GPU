@@ -135,8 +135,8 @@ namespace PhysPeach{
         updateCells(&cells, L, p.x_dev);
         updateLists(&lists, &cells, L, p.x_dev);
 
-        std::cout << "U: " << U(&p, L, &lists) << std::endl;
-        std::cout << "P: " << P(&p, L, &lists) << std::endl;
+        //std::cout << "U: " << U(&p, L, &lists) << std::endl;
+        //std::cout << "P: " << P(&p, L, &lists) << std::endl;
 
         deleteLists(&lists);
         deleteCells(&cells);
@@ -167,7 +167,7 @@ namespace PhysPeach{
             //std::cout << i << " " << K(&p) + U(&p, L, &lists) << std::endl;
         }
         E2 = K(&p) + U(&p, L, &lists);
-        assert(-0.005 < E1 - E2 && E1 - E2 < 0.005);
+        assert(-0.0005 < E1 - E2 && E1 - E2 < 0.0005);
         
         deleteLists(&lists);
         deleteCells(&cells);
