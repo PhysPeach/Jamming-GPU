@@ -7,5 +7,8 @@ findJamming: main/findJamming.o cu/MT.o cu/conf.o cu/particles.o cu/cells.o cu/j
 squeezeJamming: main/squeezeJamming.o cu/MT.o cu/conf.o cu/particles.o cu/cells.o cu/jamming.o
 	nvcc -arch=sm_60 -o $@ $^
 
+p-phiJamming: main/p-phiJamming.o cu/MT.o cu/conf.o cu/particles.o cu/cells.o cu/jamming.o
+	nvcc -arch=sm_60 -o $@ $^
+
 %.o: %.cu
 	nvcc -arch=sm_60 -o $@ -c $<
